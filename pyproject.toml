@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcd-points-compass"
+version = "0.1.0"
+description = "麦当劳积分资产罗盘：积分过期预警 · 商城兑换性价比 · 抽奖决策分析"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = []
+
+[project.scripts]
+mcd-points-compass = "mcd_points.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["mcd_points*"]

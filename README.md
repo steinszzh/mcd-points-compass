@@ -4,12 +4,21 @@
 
 积分是麦当劳会员最容易被忽视的资产：不知不觉过期、不知道能换什么、抽奖值不值全靠感觉。这个项目基于**麦当劳中国 MCP**，把你的积分余额变成一张清清楚楚的资产清单。
 
+## 效果预览
+
+`python -m mcd_points html` 一键生成自包含的 HTML 仪表盘（无需联网、双击即开）：
+
+![HTML 仪表盘报告](docs/assets/report-dashboard.png)
+
+> 演示数据已脱敏；想直接体验？仓库里的 [`examples/report.html`](examples/report.html) 双击就能打开。
+
 ## 功能特性
 
 - **资产总览与估值** —— 可用/累计/已用/已过期/冻结积分一屏看清，并按当前商城汇率折算成"确定性能换到的钱"
 - **积分过期预警** —— 已过期（沉没成本）、本月/下月将过期的积分主动告警
 - **兑换性价比榜** —— 解析商品名中的确定现金面值，按「元/分」折算率排序；自动过滤已下架商品，自动标注"同款更低积分"档位
 - **抽奖决策分析** —— 不编造期望值：用"机会成本 = 单次积分 × 最优兑换汇率"与奖池确定面值对照，给出诚实结论
+- **HTML 仪表盘** —— `html` 子命令输出自包含的深色仪表盘页面，表格可视化汇率条形图
 - **JSON 输出** —— 所有命令支持 `--json`，`accountId` 等敏感字段自动脱敏
 - **跨模型 Agent Skill** —— 附带模型无关的 `SKILL.md`，WorkBuddy / Cursor / Cherry Studio / Trae / VSCode 等任意 MCP 客户端都能用
 
@@ -55,7 +64,7 @@ $ python -m mcd_points report
 零第三方依赖，Python 3.9+ 即可：
 
 ```bash
-git clone https://github.com/<your-name>/mcd-points-compass.git
+git clone https://github.com/steinszzh/mcd-points-compass.git
 cd mcd-points-compass
 # 直接运行（无需安装）
 python -m mcd_points --help
@@ -85,6 +94,7 @@ python -m mcd_points report --config mcp-config.json  # 方式 3：MCP 配置文
 | `lottery` | 抽奖决策分析 |
 | `expiry` | 积分过期预警 |
 | `tools` | 列出 MCP Server 当前全部工具 |
+| `html` | 生成 HTML 仪表盘（`--out report.html`，`-` 输出到 stdout） |
 
 所有命令均支持 `--json` 输出（参数放子命令前后均可），便于接入脚本或其他 Agent。
 
@@ -135,9 +145,13 @@ mcd-points-compass/
 │   ├── models.py             #   数据模型
 │   ├── analyze.py            #   估值/性价比/抽奖分析引擎
 │   ├── render.py             #   终端渲染（CJK 对齐）
+│   ├── htmlreport.py         #   HTML 仪表盘渲染（自包含单文件）
 │   └── cli.py                #   命令行入口
 ├── SKILL.md                  # 模型无关的 Agent Skill 定义
-├── examples/sample-report.txt# 真实运行示例
+├── examples/
+│   ├── sample-report.txt     # 终端报告示例（已脱敏）
+│   └── report.html           # HTML 仪表盘示例（双击即可体验）
+├── docs/assets/              # README 截图
 ├── README.md                 # 本文件
 ├── CONTEST_DECLARATION.md    # 参赛声明（官方模板，不可改动）
 ├── MCP_INTEGRATION.md        # MCP 集成说明

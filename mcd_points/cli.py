@@ -194,6 +194,29 @@ def cmd_expiry(client, args) -> int:
     return 0
 
 
+def cmd_html(client, args) -> int:
+    """生成自包含 HTML 仪表盘报告。"""
+    from .htmlreport import render_html
+    account = _load_account(client)
+    now_str = _load_now(client)
+    now = parse_dt(now_str) if now_str else None
+    items = _load_mall(client, args.cat)
+    rows = rank_redemptions(items, now=now, top=args.top)
+    rate = best_redemption_rate(rows)
+    valuation = account_valuation(account, rate)
+    lottery = _load_lottery(client)
+    lot_analysis = analyze_lottery(lottery, rate, account)
+    warnings = expiry_warnings(account)
+    doc = render_html(account, valuation, rows, lot_analysis, warnings, now_str)
+    if args.out == "-":
+        print(doc)
+    else:
+        with open(args.out, "w", encoding="utf-8") as f:
+            f.write(doc)
+        print(f"HTML 报告已生成：{args.out}", file=sys.stderr)
+    return 0
+
+
 def cmd_tools(client, args) -> int:
     tools = client.list_tools()
     if args.json:
@@ -238,6 +261,10 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("lottery", parents=[common], help="抽奖决策分析")
     sub.add_parser("expiry", parents=[common], help="积分过期预警")
     sub.add_parser("tools", parents=[common], help="列出 MCP Server 全部工具")
+    p_html = sub.add_parser("html", parents=[common],
+                            help="生成自包含 HTML 仪表盘报告")
+    p_html.add_argument("--out", default="mcd-report.html",
+                        help="输出文件路径（默认 mcd-report.html，- 表示打印到 stdout）")
     return p
 
 
@@ -247,7 +274,7 @@ def main(argv=None) -> int:
     args.command = args.command or "report"
     handlers = {
         "report": cmd_report, "redeem": cmd_redeem, "lottery": cmd_lottery,
-        "expiry": cmd_expiry, "tools": cmd_tools,
+        "expiry": cmd_expiry, "tools": cmd_tools, "html": cmd_html,
     }
     try:
         client = build_client(args)
